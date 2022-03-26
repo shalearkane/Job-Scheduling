@@ -137,86 +137,72 @@ bool feasibility(const chromosome &c) {
     */
 
     schedule test_schedule;
-    vector<queue<gene>> stalled_tasks_on_processor(4);
+    vector<queue<gene>> tasks_on_processor(4);
 
     // (task, scheduled_task_details)
     map<int, scheduled_task_details> completed_task_details;
 
     for (int i = 1; i <= MAX_TASKS; i++) {
         gene g = c.genes[i];
-        /*
-        take one gene,
-        schedule it to the processor it requires
-        then get the processing cost
-        and add it to the time
-        */
 
-        /*
-        A processor is stalled when the oldest task in
-        stalled_tasked_on_processor can't be executed
-        */
+        // queue the genes on their respective processors
+        tasks_on_processor[g.processor].push(g);
+    }
 
-        // try finishing the stalled tasks
+    bool did_anything_run = true;
 
-        // step 1: check dependency
-        set<int> dependencies = dependency_list[g.task];
-        bool is_all_dependencies_requirements_met = true;
-        int when_task_can_start = -1;
+    while (did_anything_run) {
+        did_anything_run = false;
 
-        for (int d : dependencies) {
-            if (test_schedule.completed_tasks.count(d)) {
-                // task is completed
+        for (queue<gene> q_top : tasks_on_processor) {
+            // try to run the top of the queue
+            gene g = q_top.front();
 
-                // get communication delay
-                int delay = 0;
-                if (completed_task_details[d].gene.processor != g.processor) {
-                    comm_pair c_p_temp = {d, g.task};
-                    int delay = communication_delay[c_p_temp];
-                }
-                when_task_can_start =
-                    max(completed_task_details[d].end_time + delay,
-                        when_task_can_start);
-                continue;
-            } else {
-                is_all_dependencies_requirements_met = false;
-                int processor_to_run_dependency_on = -1;
+            set<int> dependencies = dependency_list[g.task];
+            bool is_all_dependencies_requirements_met = true;
+            int when_task_can_start = -1;
 
-                // get dependency gene
-                for (gene d_gene : c.genes) {
-                    if (d_gene.task == d) {
-                        processor_to_run_dependency_on = d_gene.processor;
-
-                        // check is that task is on the same processor
-
-                        if (d_gene.processor == g.processor) {
-                            // not possible to schedule
-                            return false;
-                        } else {
-                            // submit the dependency task on processor queue
-                            stalled_tasks_on_processor
-                                [processor_to_run_dependency_on]
-                                    .push(d_gene);
-
-                            // submit the stalled task to the processor queue
-                            stalled_tasks_on_processor[g.processor].push(g);
-                        }
+            for (int d : dependencies) {
+                if (test_schedule.completed_tasks.count(d)) {
+                    // task is completed
+                    // get communication delay
+                    int delay = 0;
+                    if (completed_task_details[d].gene.processor !=
+                        g.processor) {
+                        comm_pair c_p_temp = {d, g.task};
+                        int delay = communication_delay[c_p_temp];
                     }
+                    when_task_can_start =
+                        max(completed_task_details[d].end_time + delay,
+                            when_task_can_start);
+                    continue;
+                } else {
+                    // dependency not completed
+                    // so wait
+                    is_all_dependencies_requirements_met = false;
+                    break;
                 }
             }
-        }
 
-        if (is_all_dependencies_requirements_met) {
-            scheduled_task_details stdop_temp;
-            stdop_temp.gene = g;
-            stdop_temp.start_time =
-                max(when_task_can_start,
-                    test_schedule.processor_schedule[g.processor]
-                        .top()
-                        .end_time) +
-                1;
-            stdop_temp.end_time =
-                stdop_temp.start_time + processing_cost[g.task][g.processor];
-            test_schedule.processor_schedule[g.processor].push(stdop_temp);
+            // schedule the task
+            if (is_all_dependencies_requirements_met) {
+                // remove the task from top of the queue
+                q_top.pop();
+                did_anything_run = true;
+
+                scheduled_task_details stdop_temp;
+                stdop_temp.gene = g;
+                stdop_temp.start_time =
+                    max(when_task_can_start,
+                        test_schedule.processor_schedule[g.processor]
+                            .top()
+                            .end_time) +
+                    1;
+                stdop_temp.end_time = stdop_temp.start_time +
+                                      processing_cost[g.task][g.processor];
+                test_schedule.processor_schedule[g.processor].push(stdop_temp);
+                test_schedule.completed_tasks.insert(g.task);
+            }
         }
     }
     return true;
