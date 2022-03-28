@@ -17,44 +17,44 @@ So it is necessary to have an empty 0th index
 on all data structures.
 */
 
-typedef struct {
+typedef struct gene {
     int task;
     int processor;
 } gene;
 
 // chromosome
 // genes encode task on processor
-typedef struct {
+typedef struct chromosome {
     gene genes[MAX_TASKS + 1];
-    int average_cost;
+    double average_cost;
     int makespan;
 } chromosome;
 
 // task and the associated cost to process on a
 // specific processor
-typedef struct {
+typedef struct process_cost {
     int task;
     int cost_on_processor[MAX_PROCESSORS + 1];
 } process_cost;
 
 // communication cost
-typedef struct {
+typedef struct comm_cost_pair {
     int to_node;
     int comm_cost;
 } comm_cost_pair;
 
-typedef struct {
+typedef struct comm_delay_pair {
     int from_node;
     int comm_delay;
 } comm_delay_pair;
 
-typedef struct {
+typedef struct comm_pair {
     int from_node;
     int to_node;
 } comm_pair;
 
 // scheduling details
-typedef struct {
+typedef struct scheduled_task_details {
     gene gene;
     int start_time;
     int end_time;
@@ -64,6 +64,11 @@ typedef struct {
     set<int> completed_tasks;
     vector<stack<scheduled_task_details>> processor_schedule;
 } schedule;
+
+typedef struct feasibility_details {
+    bool is_feasible;
+    schedule schedule;
+} feasibility_details;
 
 const vector<vector<comm_cost_pair>> dag = {
     {},                                           // 0
@@ -102,7 +107,8 @@ const vector<vector<int>> processing_cost = {
 // mutation
 // crossover
 
-bool feasibility(const chromosome &c) {
+feasibility_details feasibility(const chromosome &c) {
+    feasibility_details fd;
     // checks feasibility by simulating
     // the task on the processors
 
@@ -191,22 +197,71 @@ bool feasibility(const chromosome &c) {
                 q_top.pop();
                 did_anything_run = true;
 
-                scheduled_task_details stdop_temp;
-                stdop_temp.gene = g;
-                stdop_temp.start_time =
+                scheduled_task_details st_details;
+                st_details.gene = g;
+                st_details.start_time =
                     max(when_task_can_start,
                         test_schedule.processor_schedule[g.processor]
                             .top()
                             .end_time) +
                     1;
-                stdop_temp.end_time = stdop_temp.start_time +
+                st_details.end_time = st_details.start_time +
                                       processing_cost[g.task][g.processor];
-                test_schedule.processor_schedule[g.processor].push(stdop_temp);
+                test_schedule.processor_schedule[g.processor].push(st_details);
                 test_schedule.completed_tasks.insert(g.task);
             }
         }
     }
-    return true;
+
+    int is_feasible = true;
+    for (queue<gene> q : tasks_on_processor) {
+        if (q.size() > 0) {
+            is_feasible = false;
+            break;
+        }
+    }
+    fd.is_feasible = is_feasible;
+    fd.schedule = test_schedule;
+    return fd;
+}
+
+int average_cost_of_processing(vector<vector<int>> processing_cost,
+                               chromosome chromosomes) {
+    int sum = 0;
+    int t, p, c;
+    for (auto i : chromosomes.genes) {
+
+        t = i.task;
+        p = i.processor;
+        sum += processing_cost[t][p];
+    }
+
+    return sum / (processing_cost.size() - 1);
+}
+
+chromosome crossover(const chromosome A, const chromosome B) {
+    chromosome C;
+    set<gene> s;
+    int r = rand() % sizeof(A.genes);
+    for (int i = 1; i < r; i++) {
+        C.genes[i] = A.genes[i];
+        s.insert(A.genes[i]);
+    }
+    for (int i = r; i <= MAX_TASKS; i++) {
+        C.genes[i] = B.genes[i];
+        s.insert(B.genes[i]);
+    }
+    for (int i = 0; i < r; i++) {
+        if (s.find(B.genes[i]) == s.end()) {
+            C.genes[i] = B.genes[i];
+            s.insert(B.genes[i]);
+        }
+    }
+    return C;
+}
+
+double fitness(double average_cost, int make_span) {
+    return (1.0 / 1.0 + (make_span * average_cost));
 }
 
 int main() {
