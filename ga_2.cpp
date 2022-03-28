@@ -128,12 +128,8 @@ bool feasibility(const chromosome &c) {
 
     /*
     Step 2 :
-    Try scheduling the task
-    stop if dependency order is not met
-    (pause execution on one processor if dependency is to run on different
-    processor)
-    (stop trying if dependency is scheduled on the same processor but
-    later)
+    prepare n queue for jobs to run on n processors
+    Then pop one job from top of the queue if its dependencies are met
     */
 
     schedule test_schedule;
@@ -149,11 +145,16 @@ bool feasibility(const chromosome &c) {
         tasks_on_processor[g.processor].push(g);
     }
 
+    /*
+    All of the processors are stalled if none of
+    the top jobs can be executed
+    */
     bool did_anything_run = true;
 
     while (did_anything_run) {
         did_anything_run = false;
 
+        // q_top -> queue of tasks on processos
         for (queue<gene> q_top : tasks_on_processor) {
             // try to run the top of the queue
             gene g = q_top.front();
