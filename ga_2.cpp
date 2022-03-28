@@ -264,9 +264,29 @@ double fitness(double average_cost, int make_span) {
     return (1.0 / 1.0 + (make_span * average_cost));
 }
 
+double fitness(double average_cost,int make_span){
+    
+    return (1/1+(make_span * average_cost));
+}
+
+double avg_cost(vector<vector<int>> processing_cost, chromosome chromosomes){
+    double sum = 0;
+    int t,p;
+    for(auto i : chromosomes.genes){
+        
+        t = i.task;
+        p = i.processor;
+        sum += processing_cost[t][p];
+    }
+
+    return sum/(processing_cost.size()-1);
+}
+
 int main() {
-    srand(time(0));
-    chromosome c;
-    cout << (rand() % 10) + 1;
-    return 0;
+    // srand(time(0));
+    // chromosome c;
+    // cout << (rand() % 10) + 1;
+    // return 0;
+    chromosome ch1;
+    avg_cost(processing_cost, ch1);
 }
