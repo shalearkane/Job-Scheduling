@@ -243,21 +243,49 @@ chromosome crossover(const chromosome A, const chromosome B) {
     chromosome C;
     set<gene> s;
     int r = rand() % sizeof(A.genes);
+    int counter = 1;
     for (int i = 1; i < r; i++) {
-        C.genes[i] = A.genes[i];
-        s.insert(A.genes[i]);
+        if (s.find(A.genes[i]) == s.end()) {
+            C.genes[counter] = A.genes[i];
+            counter++;
+            s.insert(A.genes[i]);
+        }
     }
     for (int i = r; i <= MAX_TASKS; i++) {
-        C.genes[i] = B.genes[i];
-        s.insert(B.genes[i]);
-    }
-    for (int i = 0; i < r; i++) {
         if (s.find(B.genes[i]) == s.end()) {
+            C.genes[counter] = B.genes[i];
+            counter++;
+            s.insert(B.genes[i]);
+        }
+    }
+    for (int i = 1; i < r; i++) {
+        if (s.find(B.genes[i]) == s.end()) {
+            // if we don't find the gene
+            // then we insert the gene in the same position
+            // because if we insert the gene in the last position,
+            // because of breaking dependency, it might make the offspring
+            // unfit.
+            for (int j = MAX_TASKS - 1; j >= i; j--) {
+                C.genes[j + 1] = C.genes[j];
+            }
             C.genes[i] = B.genes[i];
             s.insert(B.genes[i]);
         }
     }
     return C;
+}
+
+chromosome mutation(chromosome &off_spring, float mutation_rate) {
+    if ((float)rand() / (float)RAND_MAX <= mutation_rate) {
+        // random indexes
+        int a = (rand() % MAX_TASKS) + 1;
+        int b = (rand() % MAX_TASKS) + 1;
+        if (off_spring.genes[a].processor != off_spring.genes[b].processor ||
+            off_spring.genes[a].task != off_spring.genes[b].task) {
+            swap(off_spring.genes[a].processor, off_spring.genes[b].processor);
+            swap(off_spring.genes[a].task, off_spring.genes[b].task);
+        }
+    }
 }
 
 double fitness(double average_cost, int make_span) {
