@@ -20,10 +20,9 @@ on all data structures.
 
 // functions to write:
 
-// feasibility
+// feasibility_details
 // average_cost
 // makespan
-// two operator
 // mutation
 // crossover
 
@@ -145,8 +144,7 @@ feasibility_details feasibility(const chromosome &c) {
     return fd;
 }
 
-int get_average_cost(std::vector<std::vector<int>> processing_cost,
-                     chromosome chromosomes) {
+int average_cost(chromosome chromosomes) {
     int sum = 0;
     int t, p, c;
     for (gene i : chromosomes.genes) {
@@ -209,7 +207,7 @@ void mutation(chromosome &off_spring, float mutation_rate) {
     }
 }
 
-int get_makespan(schedule s) {
+int makespan(schedule s) {
     int time = 0;
     for (std::vector<scheduled_task_details> st : s.processor_schedule) {
         int end_time = st.back().end_time;
