@@ -36,7 +36,7 @@ feasibility_details feasibility(const chromosome &c) {
     */
     std::map<int, std::set<int>> dependency_list;
     // map<from_node, map<to_node, delay>>
-    std::map<int, map<int, int>> communication_delay;
+    std::map<int, std::map<int, int>> communication_delay;
 
     for (int i = 1; i <= MAX_TASKS; i++) {
         // for every node that communicates to to_node
@@ -160,25 +160,25 @@ int average_cost(chromosome chromosomes) {
 
 chromosome crossover(const chromosome A, const chromosome B) {
     chromosome C;
-    std::set<gene> s;
+    std::set<int> tasks;
     int r = rand() % sizeof(A.genes);
     int counter = 1;
     for (int i = 1; i < r; i++) {
-        if (s.find(A.genes[i]) == s.end()) {
+        if (tasks.find(A.genes[i].task) == tasks.end()) {
             C.genes[counter] = A.genes[i];
             counter++;
-            s.insert(A.genes[i]);
+            tasks.insert(A.genes[i].task);
         }
     }
     for (int i = r; i <= MAX_TASKS; i++) {
-        if (s.find(B.genes[i]) == s.end()) {
+        if (tasks.find(B.genes[i].task) == tasks.end()) {
             C.genes[counter] = B.genes[i];
             counter++;
-            s.insert(B.genes[i]);
+            tasks.insert(B.genes[i].task);
         }
     }
     for (int i = 1; i < r; i++) {
-        if (s.find(B.genes[i]) == s.end()) {
+        if (tasks.find(B.genes[i].task) == tasks.end()) {
             // if we don't find the gene
             // then we insert the gene in the same position
             // because if we insert the gene in the last position,
@@ -188,7 +188,7 @@ chromosome crossover(const chromosome A, const chromosome B) {
                 C.genes[j + 1] = C.genes[j];
             }
             C.genes[i] = B.genes[i];
-            s.insert(B.genes[i]);
+            tasks.insert(B.genes[i].task);
         }
     }
     return C;
