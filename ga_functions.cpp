@@ -194,7 +194,7 @@ chromosome crossover(const chromosome A, const chromosome B) {
     return C;
 }
 
-void mutation(chromosome &off_spring, float mutation_rate) {
+chromosome mutation(chromosome off_spring, float mutation_rate) {
     if ((float)rand() / (float)RAND_MAX <= mutation_rate) {
         // random indexes
         int a = (rand() % MAX_TASKS) + 1;
@@ -206,6 +206,7 @@ void mutation(chromosome &off_spring, float mutation_rate) {
             std::swap(off_spring.genes[a].task, off_spring.genes[b].task);
         }
     }
+    return off_spring;
 }
 
 int makespan(schedule s) {

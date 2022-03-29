@@ -15,6 +15,7 @@ typedef struct chromosome_s {
     gene genes[MAX_TASKS + 1];
     float average_cost;
     int makespan;
+    float fitness_value;
 } chromosome;
 
 // task and the associated cost to process on a
