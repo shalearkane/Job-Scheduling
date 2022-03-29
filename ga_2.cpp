@@ -93,8 +93,7 @@ feasibility_details feasibility(const chromosome &c) {
                     // task is completed
                     // get communication delay
                     int delay = 0;
-                    if (completed_task_details[d].gene.processor !=
-                        g.processor) {
+                    if (completed_task_details[d].g.processor != g.processor) {
                         comm_pair c_p_temp = {d, g.task};
                         int delay = communication_delay[c_p_temp];
                     }
@@ -117,16 +116,17 @@ feasibility_details feasibility(const chromosome &c) {
                 did_anything_run = true;
 
                 scheduled_task_details st_details;
-                st_details.gene = g;
+                st_details.g = g;
                 st_details.start_time =
                     max(when_task_can_start,
                         test_schedule.processor_schedule[g.processor]
-                            .top()
+                            .back()
                             .end_time) +
                     1;
                 st_details.end_time = st_details.start_time +
                                       processing_cost[g.task][g.processor];
-                test_schedule.processor_schedule[g.processor].push(st_details);
+                test_schedule.processor_schedule[g.processor].push_back(
+                    st_details);
                 test_schedule.completed_tasks.insert(g.task);
             }
         }
@@ -140,7 +140,7 @@ feasibility_details feasibility(const chromosome &c) {
         }
     }
     fd.is_feasible = is_feasible;
-    fd.schedule = test_schedule;
+    fd.sched = test_schedule;
     return fd;
 }
 
@@ -209,8 +209,8 @@ void mutation(chromosome &off_spring, float mutation_rate) {
 
 int get_makespan(schedule s) {
     int time = 0;
-    for (stack<scheduled_task_details> st : s.processor_schedule) {
-        int end_time = st.top().end_time;
+    for (vector<scheduled_task_details> st : s.processor_schedule) {
+        int end_time = st.back().end_time;
         time = max(end_time, time);
     }
     return time;
