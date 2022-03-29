@@ -1,8 +1,7 @@
-#pragma once
+#include "ga_functions.hpp"
 #include "ga_constants.hpp"
 #include "ga_inputs.hpp"
 #include "ga_structs.hpp"
-#include <cstdlib>
 #include <iostream>
 #include <map>
 #include <queue>
@@ -36,7 +35,8 @@ feasibility_details feasibility(const chromosome &c) {
     Calculate Dependency
     */
     std::map<int, std::set<int>> dependency_list;
-    std::map<comm_pair, int> communication_delay;
+    // map<from_node, map<to_node, delay>>
+    std::map<int, map<int, int>> communication_delay;
 
     for (int i = 1; i <= MAX_TASKS; i++) {
         // for every node that communicates to to_node
@@ -47,7 +47,7 @@ feasibility_details feasibility(const chromosome &c) {
                 .to_node = a.to_node,
             };
             dependency_list[a.to_node].insert(i);
-            communication_delay[p] = a.comm_cost;
+            communication_delay[p.from_node][p.to_node] = a.comm_cost;
         }
     }
 
@@ -95,7 +95,8 @@ feasibility_details feasibility(const chromosome &c) {
                     int delay = 0;
                     if (completed_task_details[d].g.processor != g.processor) {
                         comm_pair c_p_temp = {d, g.task};
-                        int delay = communication_delay[c_p_temp];
+                        int delay = communication_delay[c_p_temp.from_node]
+                                                       [c_p_temp.to_node];
                     }
                     when_task_can_start =
                         std::max(completed_task_details[d].end_time + delay,
