@@ -1,3 +1,4 @@
+#pragma once
 #include "ga_constants.hpp"
 #include <set>
 #include <stack>

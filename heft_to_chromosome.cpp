@@ -12,6 +12,8 @@ vector<set<int>> dependency(dag.size());
 vector<float> mean_wt(dag.size(), 0);
 vector<float> upward_rank(dag.size(), 0);
 
+chromosome heft_chromosome;
+
 // {task, upward_rank}
 vector<pair<int, float>> upward_rank_sorted(dag.size(), {0, 0});
 
@@ -92,6 +94,7 @@ void set_upward_rank() {
 }
 
 void calculate_schedule(schedule &schedule) {
+    int heft_gene_counter = 0;
 
     for (pair<int, float> task : upward_rank_sorted) {
         // minimise the time by testing scheduling on
@@ -182,6 +185,8 @@ void calculate_schedule(schedule &schedule) {
         st_details.g.processor = min_eft.second;
         st_details.end_time = min_eft.first;
         schedule.processor_schedule[min_eft.second].push_back(st_details);
+        heft_chromosome.genes[heft_gene_counter].task = task.first;
+        heft_chromosome.genes[heft_gene_counter].processor = min_eft.second;
         tasks_to_processor[min_eft.second].insert(task.first);
         // print_schedule();
     }

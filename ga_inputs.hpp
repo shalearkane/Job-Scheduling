@@ -1,3 +1,4 @@
+#pragma once
 #include "ga_structs.hpp"
 #include <vector>
 

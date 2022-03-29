@@ -1,5 +1,6 @@
 #include "ga_constants.hpp"
 #include "ga_inputs.hpp"
+#include "ga_structs.hpp"
 #include <cstdlib>
 #include <iostream>
 #include <map>
@@ -148,7 +149,7 @@ int get_average_cost(vector<vector<int>> processing_cost,
                      chromosome chromosomes) {
     int sum = 0;
     int t, p, c;
-    for (auto i : chromosomes.genes) {
+    for (gene i : chromosomes.genes) {
 
         t = i.task;
         p = i.processor;
