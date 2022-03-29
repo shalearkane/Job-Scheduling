@@ -26,7 +26,7 @@ typedef struct gene {
 // genes encode task on processor
 typedef struct chromosome {
     gene genes[MAX_TASKS + 1];
-    double average_cost;
+    float average_cost;
     int makespan;
 } chromosome;
 
@@ -60,7 +60,7 @@ typedef struct scheduled_task_details {
     int end_time;
 } scheduled_task_details;
 
-typedef struct {
+typedef struct schedule {
     set<int> completed_tasks;
     vector<stack<scheduled_task_details>> processor_schedule;
 } schedule;
@@ -225,8 +225,8 @@ feasibility_details feasibility(const chromosome &c) {
     return fd;
 }
 
-int average_cost_of_processing(vector<vector<int>> processing_cost,
-                               chromosome chromosomes) {
+int get_average_cost(vector<vector<int>> processing_cost,
+                     chromosome chromosomes) {
     int sum = 0;
     int t, p, c;
     for (auto i : chromosomes.genes) {
@@ -275,7 +275,7 @@ chromosome crossover(const chromosome A, const chromosome B) {
     return C;
 }
 
-chromosome mutation(chromosome &off_spring, float mutation_rate) {
+void mutation(chromosome &off_spring, float mutation_rate) {
     if ((float)rand() / (float)RAND_MAX <= mutation_rate) {
         // random indexes
         int a = (rand() % MAX_TASKS) + 1;
@@ -288,7 +288,16 @@ chromosome mutation(chromosome &off_spring, float mutation_rate) {
     }
 }
 
-double fitness(double average_cost, int make_span) {
+int get_makespan(schedule s) {
+    int time = 0;
+    for (stack<scheduled_task_details> st : s.processor_schedule) {
+        int end_time = st.top().end_time;
+        time = max(end_time, time);
+    }
+    return time;
+}
+
+float fitness(float average_cost, int make_span) {
     return (1.0 / 1.0 + (make_span * average_cost));
 }
 
