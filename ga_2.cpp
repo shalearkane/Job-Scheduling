@@ -158,6 +158,7 @@ int get_average_cost(vector<vector<int>> processing_cost,
     return sum / (processing_cost.size() - 1);
 }
 
+
 chromosome crossover(const chromosome A, const chromosome B) {
     chromosome C;
     set<gene> s;
@@ -194,7 +195,7 @@ chromosome crossover(const chromosome A, const chromosome B) {
     return C;
 }
 
-void mutation(chromosome &off_spring, float mutation_rate) {
+chromosome mutation(chromosome off_spring, float mutation_rate) {
     if ((float)rand() / (float)RAND_MAX <= mutation_rate) {
         // random indexes
         int a = (rand() % MAX_TASKS) + 1;
@@ -205,6 +206,40 @@ void mutation(chromosome &off_spring, float mutation_rate) {
             swap(off_spring.genes[a].task, off_spring.genes[b].task);
         }
     }
+    return off_spring;
+}
+
+
+vector<chromosome> population_array;
+void population(chromosome heft){
+    int i=0;
+    chromosome temp;
+    temp = mutation(heft,0.1);
+    while(i < max_population-1){
+        if(feasibility(temp).is_feasible){
+            population_array.push_back(temp);
+            i++;
+        };
+
+    }
+}
+
+bool cmp_fitness_val(chromosome c1, chromosome c2){
+    return(c1.fitness_value<c2.fitness_value);
+}
+void generation(){
+    vector<chromosome>:: iterator itr;
+    float sum_fitness;
+    for(itr = population_array.begin();itr!=population_array.end();itr++){
+        itr->fitness_value = fitness(itr->average_cost,itr->makespan);
+        sum_fitness += itr->fitness_value;
+    }
+    average_fitness_val = sum_fitness/ (float) population_array.size();
+
+    sort(population_array.begin(), population_array.end(),cmp_fitness_val );    
+
+    
+    
 }
 
 int get_makespan(schedule s) {
@@ -216,14 +251,15 @@ int get_makespan(schedule s) {
     return time;
 }
 
-float fitness(float average_cost, int make_span) {
+float average_fitness_val;
+float fitness(float average_cost, int make_span){
+
     return (1.0 / 1.0 + (make_span * average_cost));
 }
 
 int main() {
-    srand(time(0));
+    
     chromosome c;
-    cout << (rand() % 10) + 1;
     return 0;
     chromosome population[20];
 }

@@ -2,6 +2,7 @@
 #include <set>
 #include <stack>
 #include <vector>
+#include <bits/stdc++.h>
 
 typedef struct gene {
     int task;
@@ -14,6 +15,7 @@ typedef struct chromosome {
     gene genes[MAX_TASKS + 1];
     float average_cost;
     int makespan;
+    double fitness_value;
 } chromosome;
 
 // task and the associated cost to process on a
