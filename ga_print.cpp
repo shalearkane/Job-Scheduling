@@ -39,3 +39,11 @@ void print_scheduled_task_details(const scheduled_task_details sched_td) {
     cerr << "Task " << sched_td.g.task << " : " << sched_td.start_time << " - "
          << sched_td.end_time << '\n';
 }
+
+void print_genes(const gene *g) {
+    cerr << "Gene : ";
+    for (int i = 1; i <= MAX_TASKS; i++) {
+        cerr << "(" << g[i].task << " : " << g[i].processor << "), ";
+    }
+    cerr << '\n';
+}

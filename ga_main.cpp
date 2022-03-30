@@ -5,6 +5,7 @@
 #include "ga_print.hpp"
 #include "ga_structs.hpp"
 #include <algorithm>
+#include <cassert>
 #include <cstdlib>
 #include <iostream>
 using namespace std;
@@ -12,7 +13,7 @@ using namespace std;
 vector<chromosome> population_array;
 float average_fitness_val;
 
-void population(chromosome heft) {
+void population(const chromosome heft) {
     int i = 0;
     chromosome temp;
     temp = mutation(heft, 0.1);
@@ -22,14 +23,15 @@ void population(chromosome heft) {
             i++;
         };
     }
+    population_array.push_back(heft);
 }
 
-bool cmp_fitness_val(chromosome c1, chromosome c2) {
+bool cmp_fitness_val(const chromosome &c1, const chromosome &c2) {
     return (c1.fitness_value < c2.fitness_value);
 }
 void generation() {
-
     vector<chromosome>::iterator itr;
+
     for (itr = population_array.begin(); itr != population_array.end(); itr++) {
         itr->average_cost = average_cost(*itr);
     }
@@ -47,11 +49,10 @@ void generation() {
 
     sort(population_array.begin(), population_array.end(), cmp_fitness_val);
     itr = population_array.begin();
-    chromosome temp;
-    for (int i = 0; i < 14; i += 2) {
 
-        temp = mutation(crossover(population_array[i], population_array[i + 1]),
-                        0.1);
+    for (int i = 0; i < 14; i += 2) {
+        chromosome temp = mutation(
+            crossover(population_array[i], population_array[i + 1]), 0.1);
         if (feasibility(temp).is_feasible) {
             population_array.push_back(temp);
         };
@@ -61,16 +62,13 @@ void generation() {
 }
 
 int main() {
-    srand(time(0));
-    feasibility_details fd;
-    chromosome c = get_heft_chromosome();
-    // population(c);
-    fd = feasibility(c);
-    cerr << "\nFeasibility schedule :\n";
-    print_schedule(fd.sched);
-    cerr << "\nIs feasible : " << fd.is_feasible;
-    print_chromosome(c);
-    cout << (rand() % 10) + 1;
-    chromosome population[20];
-    fitness(12, 23);
+    srand(time_t(0));
+    chromosome heft = get_heft_chromosome();
+    population(heft);
+    population_array.push_back(heft);
+    for (int i = 0; i < 200; i++) {
+        generation();
+    }
+
+    return 0;
 }

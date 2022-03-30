@@ -199,9 +199,11 @@ int average_cost(const chromosome chromosomes) {
 }
 
 chromosome crossover(const chromosome A, const chromosome B) {
+    if (DEB)
+        cerr << "Inside crossover:\n";
     chromosome C;
     set<int> tasks;
-    int r = rand() % sizeof(A.genes);
+    int r = rand() % (MAX_TASKS + 1);
     int counter = 1;
     for (int i = 1; i < r; i++) {
         if (tasks.find(A.genes[i].task) == tasks.end()) {
@@ -224,17 +226,25 @@ chromosome crossover(const chromosome A, const chromosome B) {
             // because if we insert the gene in the last position,
             // because of breaking dependency, it might make the offspring
             // unfit.
-            for (int j = MAX_TASKS - 1; j >= i; j--) {
-                C.genes[j + 1] = C.genes[j];
+            for (int j = MAX_TASKS; j > i; j--) {
+                C.genes[j] = C.genes[j - 1];
             }
             C.genes[i] = B.genes[i];
             tasks.insert(B.genes[i].task);
         }
     }
+    if (DEB) {
+        print_genes(A.genes);
+        print_genes(B.genes);
+        print_genes(C.genes);
+        cerr << "Outside crossover.\n";
+    }
     return C;
 }
 
 chromosome mutation(chromosome off_spring, const float mutation_rate) {
+    if (DEB)
+        cerr << "Inside mutation:\n";
     if ((float)rand() / (float)RAND_MAX <= mutation_rate) {
         // random indexes
         int a = (rand() % MAX_TASKS) + 1;
@@ -244,7 +254,11 @@ chromosome mutation(chromosome off_spring, const float mutation_rate) {
             swap(off_spring.genes[a].processor, off_spring.genes[b].processor);
             swap(off_spring.genes[a].task, off_spring.genes[b].task);
         }
+        if (DEB)
+            print_genes(off_spring.genes);
     }
+    if (DEB)
+        cerr << "Outside mutation.\n";
     return off_spring;
 }
 
