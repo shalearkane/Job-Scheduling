@@ -2,6 +2,7 @@
 #include "ga_functions.hpp"
 #include "ga_heft.hpp"
 #include "ga_inputs.hpp"
+#include "ga_print.hpp"
 #include "ga_structs.hpp"
 #include <algorithm>
 #include <cstdlib>
@@ -42,8 +43,11 @@ int main() {
     srand(time(0));
     feasibility_details fd;
     chromosome c = get_heft_chromosome();
+    population(c);
     fd = feasibility(c);
-    cerr << "Is feasible" << fd.is_feasible;
+    cerr << "\nFeasibility schedule :\n";
+    print_schedule(fd.sched);
+    cerr << "\nIs feasible : " << fd.is_feasible;
     print_chromosome(c);
     cout << (rand() % 10) + 1;
     chromosome population[20];

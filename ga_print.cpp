@@ -26,3 +26,10 @@ void print_queue_of_tasks_on_processor(
         std::cerr << '\n';
     }
 }
+
+void print_chromosome(const chromosome c) {
+    std::cout << "Chromosome : \n";
+    for (int i = 1; i <= MAX_TASKS; i++) {
+        std::cout << c.genes[i].task << "\t" << c.genes[i].processor << "\n";
+    }
+}

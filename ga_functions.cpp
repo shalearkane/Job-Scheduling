@@ -246,10 +246,3 @@ int makespan(const schedule s) {
 float fitness(const float average_cost, const int make_span) {
     return (1.0 / 1.0 + (make_span * average_cost));
 }
-
-void print_chromosome(const chromosome c) {
-    std::cout << "Chromosome : \n";
-    for (int i = 1; i <= MAX_TASKS; i++) {
-        std::cout << c.genes[i].task << "\t" << c.genes[i].processor << "\n";
-    }
-}
