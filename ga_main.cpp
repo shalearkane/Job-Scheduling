@@ -42,7 +42,6 @@ int main() {
     srand(time(0));
     feasibility_details fd;
     chromosome c = get_heft_chromosome();
-    cerr << "something";
     fd = feasibility(c);
     cerr << "Is feasible" << fd.is_feasible;
     print_chromosome(c);

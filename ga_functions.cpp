@@ -2,13 +2,13 @@
 #include "ga_constants.hpp"
 #include "ga_inputs.hpp"
 #include "ga_structs.hpp"
+#include <cassert>
 #include <iostream>
 #include <map>
 #include <queue>
 #include <set>
 #include <stack>
 #include <vector>
-using namespace std;
 
 /*
 Note :
@@ -26,8 +26,18 @@ on all data structures.
 // mutation
 // crossover
 
+void print_queue(std::vector<std::queue<gene>> tasks_on_processor) {
+    for (int i = 0; i <= MAX_PROCESSORS; i++) {
+        std::queue<gene> q = tasks_on_processor[i];
+        while (!q.empty()) {
+            std::cerr << q.front().task << " : " << q.front().processor << "\n";
+            q.pop();
+        }
+        std::cerr << '\n';
+    }
+}
+
 feasibility_details feasibility(const chromosome c) {
-    cerr << "In here";
     feasibility_details fd;
     // checks feasibility by simulating
     // the task on the processors
@@ -60,6 +70,16 @@ feasibility_details feasibility(const chromosome c) {
     */
 
     schedule test_schedule;
+    // populate test_schedule.processor_schedule
+    for (int i = 1; i <= MAX_PROCESSORS + 1; i++) {
+        scheduled_task_details temp;
+        gene g;
+        g.task = g.processor = 0;
+        temp.end_time = temp.start_time = 0;
+        temp.g = g;
+        test_schedule.processor_schedule.push_back({temp});
+    }
+    assert(test_schedule.processor_schedule.size() == MAX_PROCESSORS + 1);
     std::vector<std::queue<gene>> tasks_on_processor(4);
 
     // (task, scheduled_task_details)
@@ -69,6 +89,7 @@ feasibility_details feasibility(const chromosome c) {
         gene g = c.genes[i];
 
         // queue the genes on their respective processors
+        assert(g.processor <= MAX_PROCESSORS);
         tasks_on_processor[g.processor].push(g);
     }
 
@@ -77,14 +98,24 @@ feasibility_details feasibility(const chromosome c) {
     the top jobs can be executed
     */
     bool did_anything_run = true;
+    int counter_to_stop = 0;
+    print_queue(tasks_on_processor);
 
     while (did_anything_run) {
+        counter_to_stop++;
         did_anything_run = false;
 
         // q_top -> queue of tasks on processos
-        for (std::queue<gene> q : tasks_on_processor) {
+        for (int i = 1; i <= MAX_PROCESSORS; i++) {
+            std::queue<gene> q = tasks_on_processor[i];
+            if (q.empty())
+                continue;
             // try to run the top of the queue
             gene g = q.front();
+            if (DEB) {
+                std::cerr << i << " == " << g.task << " : " << g.processor
+                          << '\n';
+            }
 
             std::set<int> dependencies = dependency_list[g.task];
             bool is_all_dependencies_requirements_met = true;
@@ -113,9 +144,13 @@ feasibility_details feasibility(const chromosome c) {
             }
 
             // schedule the task
-            if (is_all_dependencies_requirements_met) {
+            if (is_all_dependencies_requirements_met &&
+                !tasks_on_processor[i].empty()) {
                 // remove the task from top of the queue
-                q.pop();
+                tasks_on_processor[i].pop();
+                if (DEB) {
+                    std::cerr << tasks_on_processor[i].size() << " Popped\n";
+                }
                 did_anything_run = true;
 
                 scheduled_task_details st_details;
@@ -133,6 +168,8 @@ feasibility_details feasibility(const chromosome c) {
                 test_schedule.completed_tasks.insert(g.task);
             }
         }
+        if (counter_to_stop == 20)
+            break;
     }
 
     int is_feasible = true;

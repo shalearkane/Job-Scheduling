@@ -8,7 +8,6 @@
 #include <vector>
 using namespace std;
 
-#define DEB 0
 vector<set<int>> dependency(dag.size());
 vector<float> mean_wt(dag.size(), 0);
 vector<float> upward_rank(dag.size(), 0);
@@ -48,9 +47,9 @@ int get_end_time(int task, int processor, schedule s) {
 
 void print_schedule(schedule s) {
     for (int i = 1; i < s.processor_schedule.size(); i++) {
-        cout << "For processor " << i << " : \n";
+        cerr << "For processor " << i << " : \n";
         for (int j = 0; j < s.processor_schedule[i].size(); j++)
-            cout << s.processor_schedule[i][j].g.task << "\t"
+            cerr << s.processor_schedule[i][j].g.task << "\t"
                  << s.processor_schedule[i][j].end_time << '\n';
     }
 }
@@ -113,7 +112,7 @@ void calculate_schedule(schedule &schedule) {
             // running on processor i
 
             if (DEB) {
-                cout << "Scheduling : " << task.first << " on " << i << '\n';
+                cerr << "Scheduling : " << task.first << " on " << i << '\n';
             }
             // step 1 : calculate communication costs from each dependency
             vector<int> comm_eft(processing_cost[0].size(), 0);
@@ -139,13 +138,13 @@ void calculate_schedule(schedule &schedule) {
             int max_comm_cost = *max_element(comm_eft.begin(), comm_eft.end());
 
             if (DEB) {
-                cout << "comm_cost = " << max_comm_cost << '\n';
+                cerr << "comm_cost = " << max_comm_cost << '\n';
             }
             // step 2 : get cost of running that job on that processor
             int running_time = processing_cost[task.first][i];
 
             if (DEB) {
-                cout << "running_time = " << running_time << '\n';
+                cerr << "running_time = " << running_time << '\n';
             }
             // step 3 : get max(eft_last_running_process_on_that_processor,
             // end_time_of_dependency)
@@ -164,7 +163,7 @@ void calculate_schedule(schedule &schedule) {
                 max(schedule.processor_schedule[i].back().end_time, start_time);
 
             if (DEB) {
-                cout << "start_time = " << start_time << '\n';
+                cerr << "start_time = " << start_time << '\n';
             }
 
             int end_time = max(start_time, max_comm_cost) + running_time;

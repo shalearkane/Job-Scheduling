@@ -2,3 +2,4 @@
 #define MAX_TASKS 10
 #define MAX_PROCESSORS 3
 #define MAX_POPULATION 20
+#define DEB 0
