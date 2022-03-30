@@ -9,6 +9,17 @@ typedef struct gene_s {
     int processor;
 } gene;
 
+// scheduling details
+typedef struct scheduled_task_details_s {
+    gene g;
+    int start_time;
+    int end_time;
+} scheduled_task_details;
+
+typedef struct schedule_s {
+    std::set<int> completed_tasks;
+    std::vector<std::vector<scheduled_task_details>> processor_schedule;
+} schedule;
 // chromosome
 // genes encode task on processor
 typedef struct chromosome_s {
@@ -16,6 +27,7 @@ typedef struct chromosome_s {
     float average_cost;
     int makespan;
     float fitness_value;
+    schedule sched;
 } chromosome;
 
 // task and the associated cost to process on a
@@ -40,18 +52,6 @@ typedef struct comm_pair_s {
     int from_node;
     int to_node;
 } comm_pair;
-
-// scheduling details
-typedef struct scheduled_task_details_s {
-    gene g;
-    int start_time;
-    int end_time;
-} scheduled_task_details;
-
-typedef struct schedule_s {
-    std::set<int> completed_tasks;
-    std::vector<std::vector<scheduled_task_details>> processor_schedule;
-} schedule;
 
 typedef struct feasibility_details_s {
     bool is_feasible;
