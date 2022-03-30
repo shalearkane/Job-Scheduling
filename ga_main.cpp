@@ -43,7 +43,7 @@ int main() {
     srand(time(0));
     feasibility_details fd;
     chromosome c = get_heft_chromosome();
-    population(c);
+    // population(c);
     fd = feasibility(c);
     cerr << "\nFeasibility schedule :\n";
     print_schedule(fd.sched);

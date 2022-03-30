@@ -10,6 +10,7 @@
 #include <set>
 #include <stack>
 #include <vector>
+using namespace std;
 
 /*
 Note :
@@ -36,20 +37,20 @@ feasibility_details feasibility(const chromosome c) {
     Step 1 :
     Calculate Dependency
     */
-    std::map<int, std::set<int>> dependency_list;
+    vector<set<int>> dependency_list(dag.size());
     // map<from_node, map<to_node, delay>>
-    std::map<int, std::map<int, int>> communication_delay;
+    map<int, map<int, int>> communication_delay;
 
     for (int i = 1; i <= MAX_TASKS; i++) {
         // for every node that communicates to to_node
         // add a dependency of that to to_node
-        for (const comm_cost_pair a : dag[i]) {
+        for (const comm_cost_pair pair : dag[i]) {
             comm_pair p = {
                 .from_node = i,
-                .to_node = a.to_node,
+                .to_node = pair.to_node,
             };
-            dependency_list[a.to_node].insert(i);
-            communication_delay[p.from_node][p.to_node] = a.comm_cost;
+            dependency_list[pair.to_node].insert(i);
+            communication_delay[p.from_node][p.to_node] = pair.comm_cost;
         }
     }
 
@@ -70,10 +71,10 @@ feasibility_details feasibility(const chromosome c) {
         test_schedule.processor_schedule.push_back({temp});
     }
     assert(test_schedule.processor_schedule.size() == MAX_PROCESSORS + 1);
-    std::vector<std::queue<gene>> tasks_on_processor(4);
+    vector<queue<gene>> tasks_on_processor(4);
 
     // (task, scheduled_task_details)
-    std::map<int, scheduled_task_details> completed_task_details;
+    vector<scheduled_task_details> completed_task_details(dag.size());
     for (int i = 1; i <= MAX_TASKS; i++) {
 
         gene g = c.genes[i];
@@ -95,37 +96,38 @@ feasibility_details feasibility(const chromosome c) {
 
         // q_top -> queue of tasks on processos
         for (int i = 1; i <= MAX_PROCESSORS; i++) {
-            std::queue<gene> q = tasks_on_processor[i];
+            queue<gene> q = tasks_on_processor[i];
             if (q.empty())
                 continue;
             // try to run the top of the queue
             gene g = q.front();
             if (DEB) {
-                std::cerr << i << " == " << g.task << " : " << g.processor
-                          << '\n';
+                cerr << i << " == " << g.task << " : " << g.processor << '\n';
             }
 
-            std::set<int> dependencies = dependency_list[g.task];
+            set<int> dependencies = dependency_list[g.task];
             bool is_all_dependencies_requirements_met = true;
             int when_task_can_start = -1;
 
             for (int d : dependencies) {
+                cerr << "Getting dependency status of " << g.task << '\n';
                 if (test_schedule.completed_tasks.count(d)) {
                     // task is completed
                     // get communication delay
                     int delay = 0;
                     if (completed_task_details[d].g.processor != g.processor) {
                         comm_pair c_p_temp = {d, g.task};
-                        int delay = communication_delay[c_p_temp.from_node]
-                                                       [c_p_temp.to_node];
+                        delay = communication_delay[c_p_temp.from_node]
+                                                   [c_p_temp.to_node];
                     }
                     when_task_can_start =
-                        std::max(completed_task_details[d].end_time + delay,
-                                 when_task_can_start);
+                        max(completed_task_details[d].end_time + delay,
+                            when_task_can_start);
                     continue;
                 } else {
                     // dependency not completed
                     // so wait
+                    cerr << "Dependency " << d << " is not met.\n";
                     is_all_dependencies_requirements_met = false;
                     break;
                 }
@@ -135,31 +137,33 @@ feasibility_details feasibility(const chromosome c) {
             if (is_all_dependencies_requirements_met &&
                 !tasks_on_processor[i].empty()) {
                 // remove the task from top of the queue
-                tasks_on_processor[i].pop();
-                if (DEB) {
-                    std::cerr << tasks_on_processor[i].size() << " Popped\n";
+                if (1) {
+                    cerr << tasks_on_processor[i].front().task << " Popped\n";
                 }
+                tasks_on_processor[i].pop();
+                print_queue_of_tasks_on_processor(tasks_on_processor);
                 did_anything_run = true;
 
                 scheduled_task_details st_details;
                 st_details.g = g;
                 st_details.start_time =
-                    std::max(when_task_can_start,
-                             test_schedule.processor_schedule[g.processor]
-                                 .back()
-                                 .end_time) +
+                    max(when_task_can_start,
+                        test_schedule.processor_schedule[g.processor]
+                            .back()
+                            .end_time) +
                     1;
                 st_details.end_time = st_details.start_time +
                                       processing_cost[g.task][g.processor];
                 test_schedule.processor_schedule[g.processor].push_back(
                     st_details);
+                print_scheduled_task_details(st_details);
                 test_schedule.completed_tasks.insert(g.task);
             }
         }
     }
 
     int is_feasible = true;
-    for (std::queue<gene> q : tasks_on_processor) {
+    for (queue<gene> q : tasks_on_processor) {
         if (q.size() > 0) {
             is_feasible = false;
             break;
@@ -185,7 +189,7 @@ int average_cost(const chromosome chromosomes) {
 
 chromosome crossover(const chromosome A, const chromosome B) {
     chromosome C;
-    std::set<int> tasks;
+    set<int> tasks;
     int r = rand() % sizeof(A.genes);
     int counter = 1;
     for (int i = 1; i < r; i++) {
@@ -226,9 +230,8 @@ chromosome mutation(chromosome off_spring, const float mutation_rate) {
         int b = (rand() % MAX_TASKS) + 1;
         if (off_spring.genes[a].processor != off_spring.genes[b].processor ||
             off_spring.genes[a].task != off_spring.genes[b].task) {
-            std::swap(off_spring.genes[a].processor,
-                      off_spring.genes[b].processor);
-            std::swap(off_spring.genes[a].task, off_spring.genes[b].task);
+            swap(off_spring.genes[a].processor, off_spring.genes[b].processor);
+            swap(off_spring.genes[a].task, off_spring.genes[b].task);
         }
     }
     return off_spring;
@@ -236,9 +239,9 @@ chromosome mutation(chromosome off_spring, const float mutation_rate) {
 
 int makespan(const schedule s) {
     int time = 0;
-    for (std::vector<scheduled_task_details> st : s.processor_schedule) {
+    for (vector<scheduled_task_details> st : s.processor_schedule) {
         int end_time = st.back().end_time;
-        time = std::max(end_time, time);
+        time = max(end_time, time);
     }
     return time;
 }

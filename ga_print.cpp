@@ -16,20 +16,26 @@ void print_schedule(const schedule s) {
 }
 
 void print_queue_of_tasks_on_processor(
-    const std::vector<std::queue<gene>> tasks_on_processor) {
-    for (int i = 0; i <= MAX_PROCESSORS; i++) {
-        std::queue<gene> q = tasks_on_processor[i];
+    const vector<queue<gene>> tasks_on_processor) {
+    for (int i = 1; i <= MAX_PROCESSORS; i++) {
+        queue<gene> q = tasks_on_processor[i];
+        cerr << "Queue " << i << " :\n";
         while (!q.empty()) {
-            std::cerr << q.front().task << " : " << q.front().processor << "\n";
+            cerr << q.front().task << " : " << q.front().processor << "\n";
             q.pop();
         }
-        std::cerr << '\n';
+        cerr << '\n';
     }
 }
 
 void print_chromosome(const chromosome c) {
-    std::cout << "Chromosome : \n";
+    cerr << "Chromosome : \n";
     for (int i = 1; i <= MAX_TASKS; i++) {
-        std::cout << c.genes[i].task << "\t" << c.genes[i].processor << "\n";
+        cerr << c.genes[i].task << "\t" << c.genes[i].processor << "\n";
     }
+}
+
+void print_scheduled_task_details(const scheduled_task_details sched_td) {
+    cerr << "Task " << sched_td.g.task << " : " << sched_td.start_time << " - "
+         << sched_td.end_time << '\n';
 }
