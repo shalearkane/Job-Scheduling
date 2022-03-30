@@ -64,10 +64,24 @@ void generation() {
 int main() {
     srand(time_t(0));
     chromosome heft = get_heft_chromosome();
+    print_genes(heft.genes);
+    feasibility_details fd_heft = feasibility(heft);
+    int mk_heft = makespan(fd_heft.sched);
+    cout << "makespan heft : " << mk_heft << '\n';
+
     population(heft);
     population_array.push_back(heft);
     for (int i = 0; i < 200; i++) {
         generation();
+    }
+
+    print_genes(population_array.front().genes);
+    feasibility_details fd_final = feasibility(population_array.front());
+    int mk_final = makespan(fd_final.sched);
+    cout << "makespan final : " << mk_final << '\n';
+
+    for (int i = 0; i < population_array.size(); i++) {
+        print_genes(population_array[i].genes);
     }
 
     return 0;
