@@ -145,7 +145,7 @@ feasibility_details feasibility(const chromosome &c) {
     return fd;
 }
 
-int average_cost(chromosome chromosomes) {
+int average_cost(const chromosome chromosomes) {
     int sum = 0;
     int t, p, c;
     for (gene i : chromosomes.genes) {
@@ -194,7 +194,7 @@ chromosome crossover(const chromosome A, const chromosome B) {
     return C;
 }
 
-chromosome mutation(chromosome off_spring, float mutation_rate) {
+chromosome mutation(chromosome off_spring, const float mutation_rate) {
     if ((float)rand() / (float)RAND_MAX <= mutation_rate) {
         // random indexes
         int a = (rand() % MAX_TASKS) + 1;
@@ -209,7 +209,7 @@ chromosome mutation(chromosome off_spring, float mutation_rate) {
     return off_spring;
 }
 
-int makespan(schedule s) {
+int makespan(const schedule s) {
     int time = 0;
     for (std::vector<scheduled_task_details> st : s.processor_schedule) {
         int end_time = st.back().end_time;
@@ -218,6 +218,13 @@ int makespan(schedule s) {
     return time;
 }
 
-float fitness(float average_cost, int make_span) {
+float fitness(const float average_cost, const int make_span) {
     return (1.0 / 1.0 + (make_span * average_cost));
+}
+
+void print_chromosome(const chromosome c) {
+    std::cout << "Chromosome : \n";
+    for (int i = 1; i <= MAX_TASKS; i++) {
+        std::cout << c.genes[i].task << "\t" << c.genes[i].processor << "\n";
+    }
 }

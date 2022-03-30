@@ -1,11 +1,14 @@
-output: ga_2.o ga_functions.o
-	g++ ga_2.o ga_functions.o -o ga.out
+output: ga_main.o ga_functions.o ga_heft.o
+	g++ ga_main.o ga_functions.o ga_heft.o -o ga.out
 
-main.o: ga_2.cpp
-	g++ -c ga_2.cpp
+main.o: ga_main.cpp
+	g++ -c ga_main.cpp
 
 ga_functions.o: ga_functions.cpp
 	g++ -c ga_functions.cpp
+
+ga_heft.o: ga_heft.cpp
+	g++ -c ga_heft.cpp
 
 clean:
 	rm *.o output
