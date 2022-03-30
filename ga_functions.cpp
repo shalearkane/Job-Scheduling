@@ -45,12 +45,8 @@ feasibility_details feasibility(const chromosome c) {
         // for every node that communicates to to_node
         // add a dependency of that to to_node
         for (const comm_cost_pair pair : dag[i]) {
-            comm_pair p = {
-                .from_node = i,
-                .to_node = pair.to_node,
-            };
             dependency_list[pair.to_node].insert(i);
-            communication_delay[p.from_node][p.to_node] = pair.comm_cost;
+            communication_delay[i][pair.to_node] = pair.comm_cost;
         }
     }
 
@@ -89,7 +85,10 @@ feasibility_details feasibility(const chromosome c) {
     the top jobs can be executed
     */
     bool did_anything_run = true;
-    print_queue_of_tasks_on_processor(tasks_on_processor);
+
+    if (DEB) {
+        print_queue_of_tasks_on_processor(tasks_on_processor);
+    }
 
     while (did_anything_run) {
         did_anything_run = false;
@@ -99,18 +98,18 @@ feasibility_details feasibility(const chromosome c) {
             queue<gene> q = tasks_on_processor[i];
             if (q.empty())
                 continue;
+
             // try to run the top of the queue
             gene g = q.front();
-            if (DEB) {
-                cerr << i << " == " << g.task << " : " << g.processor << '\n';
-            }
 
             set<int> dependencies = dependency_list[g.task];
             bool is_all_dependencies_requirements_met = true;
             int when_task_can_start = -1;
 
             for (int d : dependencies) {
-                cerr << "Getting dependency status of " << g.task << '\n';
+                if (DEB) {
+                    cerr << "Getting dependency status of " << g.task << '\n';
+                }
                 if (test_schedule.completed_tasks.count(d)) {
                     // task is completed
                     // get communication delay
@@ -120,14 +119,23 @@ feasibility_details feasibility(const chromosome c) {
                         delay = communication_delay[c_p_temp.from_node]
                                                    [c_p_temp.to_node];
                     }
+
                     when_task_can_start =
                         max(completed_task_details[d].end_time + delay,
                             when_task_can_start);
-                    continue;
+
+                    if (DEB) {
+                        cerr << "delay : " << delay << ", end_time : "
+                             << completed_task_details[d].end_time << '\n';
+                        cerr << "when " << g.task
+                             << " can start : " << when_task_can_start << '\n';
+                    }
                 } else {
                     // dependency not completed
                     // so wait
-                    cerr << "Dependency " << d << " is not met.\n";
+                    if (DEB) {
+                        cerr << "Dependency " << d << " is not met.\n";
+                    }
                     is_all_dependencies_requirements_met = false;
                     break;
                 }
@@ -137,11 +145,10 @@ feasibility_details feasibility(const chromosome c) {
             if (is_all_dependencies_requirements_met &&
                 !tasks_on_processor[i].empty()) {
                 // remove the task from top of the queue
-                if (1) {
+                if (DEB) {
                     cerr << tasks_on_processor[i].front().task << " Popped\n";
                 }
                 tasks_on_processor[i].pop();
-                print_queue_of_tasks_on_processor(tasks_on_processor);
                 did_anything_run = true;
 
                 scheduled_task_details st_details;
@@ -150,13 +157,17 @@ feasibility_details feasibility(const chromosome c) {
                     max(when_task_can_start,
                         test_schedule.processor_schedule[g.processor]
                             .back()
-                            .end_time) +
-                    1;
+                            .end_time);
                 st_details.end_time = st_details.start_time +
                                       processing_cost[g.task][g.processor];
                 test_schedule.processor_schedule[g.processor].push_back(
                     st_details);
-                print_scheduled_task_details(st_details);
+
+                if (DEB) {
+                    print_queue_of_tasks_on_processor(tasks_on_processor);
+                    print_scheduled_task_details(st_details);
+                }
+                completed_task_details[g.task] = st_details;
                 test_schedule.completed_tasks.insert(g.task);
             }
         }

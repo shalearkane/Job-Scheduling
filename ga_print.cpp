@@ -21,10 +21,10 @@ void print_queue_of_tasks_on_processor(
         queue<gene> q = tasks_on_processor[i];
         cerr << "Queue " << i << " :\n";
         while (!q.empty()) {
-            cerr << q.front().task << " : " << q.front().processor << "\n";
+            cerr << q.front().task << ", ";
             q.pop();
         }
-        cerr << '\n';
+        cerr << "\n\n";
     }
 }
 
