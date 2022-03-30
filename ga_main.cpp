@@ -58,7 +58,7 @@ void generation() {
         };
     }
     sort(population_array.begin(), population_array.end(), cmp_fitness_val);
-    population_array.resize(20);
+    population_array.resize(MAX_POPULATION);
 }
 
 int main() {
@@ -71,7 +71,7 @@ int main() {
 
     population(heft);
     population_array.push_back(heft);
-    for (int i = 0; i < 200; i++) {
+    for (int i = 0; i < 2000; i++) {
         generation();
     }
 

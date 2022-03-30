@@ -185,8 +185,8 @@ feasibility_details feasibility(const chromosome c) {
     return fd;
 }
 
-int average_cost(const chromosome chromosomes) {
-    int sum = 0;
+float average_cost(const chromosome chromosomes) {
+    float sum = 0;
     int t, p, c;
     for (gene i : chromosomes.genes) {
 
@@ -195,7 +195,7 @@ int average_cost(const chromosome chromosomes) {
         sum += processing_cost[t][p];
     }
 
-    return sum / (processing_cost.size() - 1);
+    return sum / ((float)processing_cost.size() - 1);
 }
 
 chromosome crossover(const chromosome A, const chromosome B) {
