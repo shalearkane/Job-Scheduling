@@ -8,6 +8,7 @@
 #include <set>
 #include <stack>
 #include <vector>
+using namespace std;
 
 /*
 Note :
@@ -25,7 +26,8 @@ on all data structures.
 // mutation
 // crossover
 
-feasibility_details feasibility(const chromosome &c) {
+feasibility_details feasibility(const chromosome c) {
+    cerr << "In here";
     feasibility_details fd;
     // checks feasibility by simulating
     // the task on the processors
@@ -62,8 +64,8 @@ feasibility_details feasibility(const chromosome &c) {
 
     // (task, scheduled_task_details)
     std::map<int, scheduled_task_details> completed_task_details;
-
     for (int i = 1; i <= MAX_TASKS; i++) {
+
         gene g = c.genes[i];
 
         // queue the genes on their respective processors
@@ -80,9 +82,9 @@ feasibility_details feasibility(const chromosome &c) {
         did_anything_run = false;
 
         // q_top -> queue of tasks on processos
-        for (std::queue<gene> q_top : tasks_on_processor) {
+        for (std::queue<gene> q : tasks_on_processor) {
             // try to run the top of the queue
-            gene g = q_top.front();
+            gene g = q.front();
 
             std::set<int> dependencies = dependency_list[g.task];
             bool is_all_dependencies_requirements_met = true;
@@ -113,7 +115,7 @@ feasibility_details feasibility(const chromosome &c) {
             // schedule the task
             if (is_all_dependencies_requirements_met) {
                 // remove the task from top of the queue
-                q_top.pop();
+                q.pop();
                 did_anything_run = true;
 
                 scheduled_task_details st_details;
