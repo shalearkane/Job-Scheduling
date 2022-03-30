@@ -1,8 +1,9 @@
 #pragma once
 #include "ga_structs.hpp"
 #include <vector>
+using namespace std;
 
-const std::vector<std::vector<comm_cost_pair>> dag = {
+const vector<vector<comm_cost_pair>> dag = {
     {},                                           // 0
     {{2, 18}, {3, 12}, {4, 9}, {5, 11}, {6, 14}}, // 1
     {{8, 19}, {9, 16}},                           // 2
@@ -15,7 +16,7 @@ const std::vector<std::vector<comm_cost_pair>> dag = {
     {{10, 13}},                                   // 9
     {}};                                          // 10
 
-const std::vector<std::vector<int>> processing_cost = {
+const vector<vector<int>> processing_cost = {
     //  1,  2,  3
     {0, 0, 0, 0},    // 0
     {0, 14, 16, 9},  // 1

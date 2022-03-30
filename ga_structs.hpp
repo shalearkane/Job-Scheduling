@@ -3,6 +3,7 @@
 #include <set>
 #include <stack>
 #include <vector>
+using namespace std;
 
 typedef struct gene_s {
     int task;
@@ -17,8 +18,8 @@ typedef struct scheduled_task_details_s {
 } scheduled_task_details;
 
 typedef struct schedule_s {
-    std::set<int> completed_tasks;
-    std::vector<std::vector<scheduled_task_details>> processor_schedule;
+    set<int> completed_tasks;
+    vector<vector<scheduled_task_details>> processor_schedule;
 } schedule;
 // chromosome
 // genes encode task on processor
