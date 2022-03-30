@@ -1,6 +1,7 @@
 #include "ga_functions.hpp"
 #include "ga_constants.hpp"
 #include "ga_inputs.hpp"
+#include "ga_print.hpp"
 #include "ga_structs.hpp"
 #include <cassert>
 #include <iostream>
@@ -25,17 +26,6 @@ on all data structures.
 // makespan
 // mutation
 // crossover
-
-void print_queue(std::vector<std::queue<gene>> tasks_on_processor) {
-    for (int i = 0; i <= MAX_PROCESSORS; i++) {
-        std::queue<gene> q = tasks_on_processor[i];
-        while (!q.empty()) {
-            std::cerr << q.front().task << " : " << q.front().processor << "\n";
-            q.pop();
-        }
-        std::cerr << '\n';
-    }
-}
 
 feasibility_details feasibility(const chromosome c) {
     feasibility_details fd;
@@ -98,11 +88,9 @@ feasibility_details feasibility(const chromosome c) {
     the top jobs can be executed
     */
     bool did_anything_run = true;
-    int counter_to_stop = 0;
-    print_queue(tasks_on_processor);
+    print_queue_of_tasks_on_processor(tasks_on_processor);
 
     while (did_anything_run) {
-        counter_to_stop++;
         did_anything_run = false;
 
         // q_top -> queue of tasks on processos
@@ -168,8 +156,6 @@ feasibility_details feasibility(const chromosome c) {
                 test_schedule.completed_tasks.insert(g.task);
             }
         }
-        if (counter_to_stop == 20)
-            break;
     }
 
     int is_feasible = true;

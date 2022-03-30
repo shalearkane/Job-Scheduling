@@ -1,5 +1,6 @@
 #include "ga_constants.hpp"
 #include "ga_inputs.hpp"
+#include "ga_print.hpp"
 #include "ga_structs.hpp"
 #include <algorithm>
 #include <cassert>
@@ -43,15 +44,6 @@ int get_end_time(int task, int processor, schedule s) {
             return st_details.end_time;
     }
     return -1;
-}
-
-void print_schedule(schedule s) {
-    for (int i = 1; i < s.processor_schedule.size(); i++) {
-        cerr << "For processor " << i << " : \n";
-        for (int j = 0; j < s.processor_schedule[i].size(); j++)
-            cerr << s.processor_schedule[i][j].g.task << "\t"
-                 << s.processor_schedule[i][j].end_time << '\n';
-    }
 }
 
 void set_dependency() {

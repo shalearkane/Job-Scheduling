@@ -1,5 +1,6 @@
 #include "ga_constants.hpp"
 #include "ga_inputs.hpp"
+#include "ga_print.hpp"
 #include <algorithm>
 #include <cassert>
 #include <iostream>
@@ -7,7 +8,7 @@
 #include <set>
 #include <vector>
 using namespace std;
-#define DEB 1
+
 vector<set<int>> dependency(dag.size());
 vector<float> mean_wt(dag.size(), 0);
 vector<float> upward_rank(dag.size(), 0);
@@ -43,15 +44,6 @@ int get_end_time(int task, int processor, schedule s) {
             return st_details.end_time;
     }
     return -1;
-}
-
-void print_schedule(schedule s) {
-    for (int i = 1; i < s.processor_schedule.size(); i++) {
-        cout << "For processor " << i << " : \n";
-        for (int j = 0; j < s.processor_schedule[i].size(); j++)
-            cout << s.processor_schedule[i][j].g.task << "\t"
-                 << s.processor_schedule[i][j].end_time << '\n';
-    }
 }
 
 void set_dependency() {
