@@ -205,32 +205,15 @@ chromosome crossover(const chromosome A, const chromosome B) {
     set<int> tasks;
     int r = rand() % (MAX_TASKS + 1);
     int counter = 1;
-    for (int i = 1; i < r; i++) {
-        if (tasks.find(A.genes[i].task) == tasks.end()) {
-            C.genes[counter] = A.genes[i];
-            counter++;
-            tasks.insert(A.genes[i].task);
-        }
+    for (int i = 1; i <= r; i++) {
+        C.genes[counter] = A.genes[i];
+        counter++;
+        tasks.insert(A.genes[i].task);
     }
-    for (int i = r; i <= MAX_TASKS; i++) {
+    for (int i = 1; i <= MAX_TASKS; i++) {
         if (tasks.find(B.genes[i].task) == tasks.end()) {
             C.genes[counter] = B.genes[i];
             counter++;
-            tasks.insert(B.genes[i].task);
-        }
-    }
-    for (int i = 1; i < r; i++) {
-        if (tasks.find(B.genes[i].task) == tasks.end()) {
-            // if we don't find the gene
-            // then we insert the gene in the same position
-            // because if we insert the gene in the last position,
-            // because of breaking dependency, it might make the offspring
-            // unfit.
-            for (int j = MAX_TASKS; j > i; j--) {
-                C.genes[j] = C.genes[j - 1];
-            }
-            C.genes[i] = B.genes[i];
-            tasks.insert(B.genes[i].task);
         }
     }
     if (DEB) {

@@ -27,7 +27,7 @@ void population(const chromosome heft) {
 }
 
 bool cmp_fitness_val(const chromosome &c1, const chromosome &c2) {
-    return (c1.fitness_value < c2.fitness_value);
+    return (c1.fitness_value > c2.fitness_value);
 }
 void generation() {
     vector<chromosome>::iterator itr;
