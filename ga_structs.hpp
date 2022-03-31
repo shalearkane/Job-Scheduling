@@ -31,6 +31,12 @@ typedef struct chromosome_s {
     schedule sched;
 } chromosome;
 
+// offspring of crossover
+typedef struct offspring_s {
+    chromosome c1;
+    chromosome c2;
+} offspring;
+
 // task and the associated cost to process on a
 // specific processor
 typedef struct process_cost_s {

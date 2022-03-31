@@ -185,44 +185,63 @@ feasibility_details feasibility(const chromosome c) {
     return fd;
 }
 
-float average_cost(const chromosome chromosomes) {
+float average_cost(const chromosome c) {
     float sum = 0;
-    int t, p, c;
-    for (gene i : chromosomes.genes) {
+    int t, p;
+    for (int i = 1; i <= MAX_TASKS; i++) {
 
-        t = i.task;
-        p = i.processor;
+        t = c.genes[i].task;
+        p = c.genes[i].processor;
         sum += processing_cost[t][p];
     }
 
     return sum / ((float)processing_cost.size() - 1);
 }
 
-chromosome crossover(const chromosome A, const chromosome B) {
+offspring crossover(const chromosome A, const chromosome B) {
     if (DEB)
         cerr << "Inside crossover:\n";
-    chromosome C;
-    set<int> tasks;
+
+    offspring offspring_chromo;
+    set<int> tasks_in_c1;
+    set<int> tasks_in_c2;
+    int counter_for_c1 = 1;
+    int counter_for_c2 = 1;
+
     int r = rand() % (MAX_TASKS + 1);
-    int counter = 1;
+
     for (int i = 1; i <= r; i++) {
-        C.genes[counter] = A.genes[i];
-        counter++;
-        tasks.insert(A.genes[i].task);
+        offspring_chromo.c1.genes[counter_for_c1] = A.genes[i];
+        counter_for_c1++;
+        tasks_in_c1.insert(A.genes[i].task);
+
+        offspring_chromo.c2.genes[counter_for_c2] = B.genes[i];
+        counter_for_c2++;
+        tasks_in_c2.insert(B.genes[i].task);
     }
     for (int i = 1; i <= MAX_TASKS; i++) {
-        if (tasks.find(B.genes[i].task) == tasks.end()) {
-            C.genes[counter] = B.genes[i];
-            counter++;
+        if (tasks_in_c1.find(B.genes[i].task) == tasks_in_c1.end()) {
+            offspring_chromo.c1.genes[counter_for_c1] = B.genes[i];
+            counter_for_c1++;
+        }
+
+        if (tasks_in_c2.find(A.genes[i].task) == tasks_in_c2.end()) {
+            offspring_chromo.c2.genes[counter_for_c2] = A.genes[i];
+            counter_for_c2++;
         }
     }
+    assert(counter_for_c1 == MAX_TASKS + 1);
+    assert(counter_for_c2 == MAX_TASKS + 1);
+
     if (DEB) {
         print_genes(A.genes);
         print_genes(B.genes);
-        print_genes(C.genes);
+        print_genes(offspring_chromo.c1.genes);
+        print_genes(offspring_chromo.c2.genes);
         cerr << "Outside crossover.\n";
     }
-    return C;
+
+    return offspring_chromo;
 }
 
 chromosome mutation(chromosome off_spring, const float mutation_rate) {

@@ -47,10 +47,18 @@ void generation() {
     itr = population_array.begin();
 
     for (int i = 0; i < 14; i += 2) {
-        chromosome temp = mutation(
-            crossover(population_array[i], population_array[i + 1]), 0.1);
-        if (feasibility(temp).is_feasible) {
-            population_array.push_back(temp);
+        chromosome temp_1 = mutation(
+            (crossover(population_array[i], population_array[i + 1])).c1, 0.1);
+
+        chromosome temp_2 = mutation(
+            (crossover(population_array[i], population_array[i + 1])).c2, 0.1);
+
+        if (feasibility(temp_1).is_feasible) {
+            population_array.push_back(temp_1);
+        };
+
+        if (feasibility(temp_2).is_feasible) {
+            population_array.push_back(temp_2);
         };
     }
     sort(population_array.begin(), population_array.end(), cmp_fitness_val);
