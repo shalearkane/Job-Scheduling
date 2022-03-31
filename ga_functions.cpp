@@ -245,7 +245,7 @@ chromosome mutation(chromosome off_spring, const float mutation_rate) {
     return off_spring;
 }
 
-int makespan(const schedule s) {
+int makespan(const schedule &s) {
     int time = 0;
     for (vector<scheduled_task_details> st : s.processor_schedule) {
         int end_time = st.back().end_time;

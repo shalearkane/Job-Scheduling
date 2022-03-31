@@ -27,24 +27,20 @@ void population(const chromosome heft) {
 }
 
 bool cmp_fitness_val(const chromosome &c1, const chromosome &c2) {
-    return (c1.fitness_value > c2.fitness_value);
+    return (c1.fitness_value < c2.fitness_value);
 }
 void generation() {
     vector<chromosome>::iterator itr;
-
-    for (itr = population_array.begin(); itr != population_array.end(); itr++) {
-        itr->average_cost = average_cost(*itr);
-    }
-
-    for (itr = population_array.begin(); itr != population_array.end(); itr++) {
-        itr->makespan = makespan(itr->sched);
-    }
-
     float sum_fitness;
     for (itr = population_array.begin(); itr != population_array.end(); itr++) {
+        itr->average_cost = average_cost(*itr);
+        itr->sched = feasibility(*itr).sched;
+        itr->makespan = makespan(itr->sched);
+
         itr->fitness_value = fitness(itr->average_cost, itr->makespan);
         sum_fitness += itr->fitness_value;
     }
+
     average_fitness_val = sum_fitness / (float)population_array.size();
 
     sort(population_array.begin(), population_array.end(), cmp_fitness_val);
