@@ -274,5 +274,5 @@ int makespan(const schedule &s) {
 }
 
 float fitness(const float average_cost, const int make_span) {
-    return (1.0 / 1.0 + (make_span * average_cost));
+    return (1.0 / (1.0 + make_span * average_cost));
 }

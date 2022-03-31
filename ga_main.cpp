@@ -1,3 +1,4 @@
+#include "ga_cmp.hpp"
 #include "ga_constants.hpp"
 #include "ga_functions.hpp"
 #include "ga_heft.hpp"
@@ -26,9 +27,6 @@ void population(const chromosome heft) {
     population_array.push_back(heft);
 }
 
-bool cmp_fitness_val(const chromosome &c1, const chromosome &c2) {
-    return (c1.fitness_value < c2.fitness_value);
-}
 void generation() {
     vector<chromosome>::iterator itr;
     float sum_fitness;
@@ -39,6 +37,10 @@ void generation() {
 
         itr->fitness_value = fitness(itr->average_cost, itr->makespan);
         sum_fitness += itr->fitness_value;
+
+        cerr << "average_cost : " << itr->average_cost
+             << ", makespan : " << itr->makespan
+             << ", fitness : " << itr->fitness_value << '\n';
     }
 
     average_fitness_val = sum_fitness / (float)population_array.size();
