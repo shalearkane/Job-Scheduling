@@ -276,3 +276,36 @@ int makespan(const schedule &s) {
 float fitness(const float average_cost, const int make_span) {
     return (1.0 / (1.0 + make_span * average_cost));
 }
+
+vector<chromosome> roulette(const vector<chromosome> &population) {
+    vector<chromosome> result;
+    const int initial_size = population.size();
+    float total_fitness = population[0].fitness_value;
+    vector<float> fitness_offset(initial_size, 0);
+
+    for (int i = 1; i < initial_size; i++) {
+        fitness_offset[i] =
+            population[i - 1].fitness_value + fitness_offset[i - 1];
+        total_fitness += population[i].fitness_value;
+    }
+
+    const float average_fitness = total_fitness / (float)population.size();
+    const float rand_0_1 = (float)(rand() % 100) / 100.0;
+    const float roulette_offset =
+        min(rand_0_1 * average_fitness, (float)MAX_POPULATION);
+    float roulette = 0;
+
+    cerr << average_fitness << " : " << rand_0_1 << " : " << roulette_offset
+         << '\n';
+
+    for (int i = 0; i < initial_size; i++) {
+        if (population[i].fitness_value < roulette) {
+            result.push_back(population[i]);
+            roulette += roulette_offset;
+        }
+    }
+
+    assert(result.size() > 0);
+
+    return result;
+}
