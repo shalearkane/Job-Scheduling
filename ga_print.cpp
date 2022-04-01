@@ -30,9 +30,9 @@ void print_queue_of_tasks_on_processor(
 
 void print_chromosome(const chromosome c) {
     cerr << "Chromosome : \n";
-    for (int i = 1; i <= MAX_TASKS; i++) {
-        cerr << c.genes[i].task << "\t" << c.genes[i].processor << "\n";
-    }
+    print_genes(c.genes);
+    cerr << c.average_cost << " : " << c.fitness_value << " : " << c.makespan
+         << '\n';
 }
 
 void print_scheduled_task_details(const scheduled_task_details sched_td) {
