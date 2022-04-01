@@ -8,4 +8,5 @@ offspring crossover(const chromosome A, const chromosome B);
 chromosome mutation(chromosome off_spring, const float mutation_rate);
 int makespan(const schedule &s);
 float fitness(const float average_cost, const int make_span);
+vector<chromosome> roulette(const vector<chromosome> &population);
 #endif // GA_FUNCTIONS

@@ -30,7 +30,7 @@ void population(const chromosome heft) {
 void generation() {
     vector<chromosome>::iterator itr;
     float sum_fitness;
-    for (itr = population_array.begin(); itr != population_array.end(); itr++) {
+    for (itr = population_array.begin(); itr < population_array.end(); itr++) {
         itr->average_cost = average_cost(*itr);
         itr->sched = feasibility(*itr).sched;
         itr->makespan = makespan(itr->sched);
@@ -45,8 +45,7 @@ void generation() {
 
     average_fitness_val = sum_fitness / (float)population_array.size();
 
-    sort(population_array.begin(), population_array.end(), cmp_fitness_val);
-    itr = population_array.begin();
+    // sort(population_array.begin(), population_array.end(), cmp_fitness_val);
 
     for (int i = 0; i < 14; i += 2) {
         chromosome temp_1 = mutation(
@@ -56,15 +55,30 @@ void generation() {
             (crossover(population_array[i], population_array[i + 1])).c2, 0.1);
 
         if (feasibility(temp_1).is_feasible) {
+            temp_1.average_cost = average_cost(temp_1);
+            temp_1.sched = feasibility(temp_1).sched;
+            temp_1.makespan = makespan(temp_1.sched);
+            temp_1.fitness_value =
+                fitness(temp_1.average_cost, temp_1.makespan);
             population_array.push_back(temp_1);
         };
 
         if (feasibility(temp_2).is_feasible) {
+            temp_2.average_cost = average_cost(temp_2);
+            temp_2.sched = feasibility(temp_2).sched;
+            temp_2.makespan = makespan(temp_2.sched);
+            temp_2.fitness_value =
+                fitness(temp_2.average_cost, temp_2.makespan);
             population_array.push_back(temp_2);
         };
     }
+    population_array = roulette(population_array);
+    if (DEB)
+        cerr << "size : " << population_array.size() << '\n';
+
     sort(population_array.begin(), population_array.end(), cmp_fitness_val);
-    population_array.resize(MAX_POPULATION);
+    if (population_array.size() > MAX_POPULATION)
+        population_array.resize(MAX_POPULATION);
 }
 
 int main() {
@@ -77,7 +91,7 @@ int main() {
 
     population(heft);
     population_array.push_back(heft);
-    for (int i = 0; i < 2000; i++) {
+    for (int i = 0; i < 200; i++) {
         generation();
     }
 

@@ -192,10 +192,11 @@ float average_cost(const chromosome c) {
 
         t = c.genes[i].task;
         p = c.genes[i].processor;
+        assert(t > 0 && t <= MAX_TASKS);
+        assert(p > 0 && p <= MAX_PROCESSORS);
         sum += processing_cost[t][p];
     }
-
-    return sum / ((float)processing_cost.size() - 1);
+    return sum / ((float)MAX_TASKS);
 }
 
 offspring crossover(const chromosome A, const chromosome B) {
@@ -280,28 +281,22 @@ float fitness(const float average_cost, const int make_span) {
 vector<chromosome> roulette(const vector<chromosome> &population) {
     vector<chromosome> result;
     const int initial_size = population.size();
-    float total_fitness = population[0].fitness_value;
-    vector<float> fitness_offset(initial_size, 0);
-
-    for (int i = 1; i < initial_size; i++) {
-        fitness_offset[i] =
-            population[i - 1].fitness_value + fitness_offset[i - 1];
-        total_fitness += population[i].fitness_value;
-    }
-
-    const float average_fitness = total_fitness / (float)population.size();
-    const float rand_0_1 = (float)(rand() % 100) / 100.0;
-    const float roulette_offset =
-        min(rand_0_1 * average_fitness, (float)MAX_POPULATION);
-    float roulette = 0;
-
-    cerr << average_fitness << " : " << rand_0_1 << " : " << roulette_offset
-         << '\n';
+    float max_fitness = 0;
 
     for (int i = 0; i < initial_size; i++) {
-        if (population[i].fitness_value < roulette) {
+        assert(population[i].fitness_value > 0 &&
+               population[i].fitness_value <= 1);
+
+        max_fitness = max(population[i].fitness_value, max_fitness);
+    }
+
+    for (int i = 0; i < initial_size; i++) {
+        const float rand_0_1 = (float)(rand() % 100) / 100.0;
+        const float roulette = max_fitness * rand_0_1;
+        if (population[i].fitness_value >= roulette) {
             result.push_back(population[i]);
-            roulette += roulette_offset;
+        } else {
+            cerr << population[i].fitness_value << " > " << roulette << '\n';
         }
     }
 
