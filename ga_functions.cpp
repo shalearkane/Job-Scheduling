@@ -295,8 +295,6 @@ vector<chromosome> roulette(const vector<chromosome> &population) {
         const float roulette = max_fitness * rand_0_1;
         if (population[i].fitness_value >= roulette) {
             result.push_back(population[i]);
-        } else {
-            cerr << population[i].fitness_value << " > " << roulette << '\n';
         }
     }
 
